@@ -9,7 +9,6 @@ const dateObj = new Date();
 authrouter.post("/signup", (req, res) => {
   const { email, password } = req.body;
   bcrypt.hash(password, 6, async function (err, hash) {
-    // Store hash in your password DB.
     if (err) {
       console.log("Something went wrong try again");
     } else {
@@ -26,9 +25,6 @@ authrouter.post("/signup", (req, res) => {
   });
 });
 
-
-
-
 authrouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -39,13 +35,11 @@ authrouter.post("/login", async (req, res) => {
   }
   const hash = user.password;
   const userId = user._id;
-  
 
   bcrypt.compare(password, hash, async function (err, result) {
-    
     if (
       result &&
-      user.incorrect_password_count < 6 &&
+      user.incorrect_password_count < 5 &&
       ((user.time == 0 && (user.minutes = 0)) ||
         (user.time - dateObj.getHours() <= 0 &&
           user.minutes - dateObj.getMinutes() <= 0))
@@ -66,8 +60,6 @@ authrouter.post("/login", async (req, res) => {
 
       return res.send({
         msg: "you can try after 24 hours",
-        time: time,
-        minutes: min,
       });
     } else {
       user.incorrect_password_count++, await user.save();
@@ -80,5 +72,4 @@ authrouter.post("/login", async (req, res) => {
   });
 });
 
-
-module.exports = authrouter
+module.exports = authrouter;
